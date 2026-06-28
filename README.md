@@ -1,5 +1,8 @@
-# Application Recette 19 V6
+# Application Recette 19 V9 Cloud Firebase
 
-Lien officiel : https://application-recette-19.netlify.app
+- Demande d’accès par nom de boulangerie.
+- Application bloquée tant que non autorisée.
+- Admin accès avec code 1919.
+- Firestore : collection demandes_acces.
 
-V6 : partage sélectif gratuit par fichier JSON, sauvegarde automatique, données conservées, confirmations avant suppression.
+Important : règles Firestore à configurer après publication.
