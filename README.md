@@ -1,5 +1,5 @@
-# Application Recette 19 V5
+# Application Recette 19 V5.1
 
 Lien officiel : https://application-recette-19.netlify.app
 
-Ajouts : menu familles visible, installation client, export/import des recettes.
+Corrections : renommer et supprimer les familles directement dans le menu Familles.
