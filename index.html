@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Minoterie 19">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+<title>Minoterie 19 Pro</title>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="icon-192.png" alt="Minoterie 19">
+    <div>
+      <h1>Minoterie 19 Pro</h1>
+      <div class="sub">Version 2.0 — application métier</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="bar">
+    <button onclick="App.showHome()">Accueil</button>
+    <button onclick="App.showClient()">Fiche client</button>
+    <button onclick="App.openFamilies()">Familles</button>
+    <button class="copy" onclick="App.openShare()">Partager</button>
+    <button class="secondary" onclick="App.openSettings()">Paramètres</button>
+    <button class="ok" onclick="App.save()">Sauvegarder</button>
+    <button class="secondary" onclick="App.exportJSON()">JSON</button>
+    <button class="secondary" onclick="App.exportCSV()">CSV</button>
+    <label class="secondary uploadBtn">Importer JSON<input type="file" accept=".json" onchange="App.importJSON(event)"></label>
+    <span id="status" class="saved">Données chargées</span>
+  </div>
+
+  <section id="homeView">
+    <div class="card"><h2>Tableau de bord</h2><div id="globalSummary" class="pills"></div></div>
+    <div id="dashboard" class="dashboard"></div>
+  </section>
+
+  <section id="recipesView" class="hidden">
+    <div class="card">
+      <div class="row"><button class="secondary" onclick="App.showHome()">← Retour</button><h2 id="familyTitle"></h2></div>
+      <div class="row"><div class="grow"><label>Recherche</label><input id="searchInput" placeholder="Rechercher une recette..." oninput="App.renderRecipes()"></div><button onclick="App.addRecipe()">Nouvelle recette</button></div>
+      <div id="familySummary" class="pills"></div>
+    </div>
+    <div id="recipeList"></div>
+  </section>
+
+  <section id="clientView" class="hidden">
+    <div class="card"><h2>Fiche client</h2>
+      <div class="grid">
+        <div><label>Boulangerie</label><input id="clientBakery" onchange="App.setClient('bakery',this.value)"></div>
+        <div><label>Responsable</label><input id="clientManager" onchange="App.setClient('manager',this.value)"></div>
+        <div><label>Téléphone</label><input id="clientPhone" onchange="App.setClient('phone',this.value)"></div>
+        <div><label>Date</label><input id="clientDate" type="date" onchange="App.setClient('date',this.value)"></div>
+        <div class="full"><label>Notes</label><textarea id="clientNotes" onchange="App.setClient('notes',this.value)"></textarea></div>
+      </div>
+      <div id="clientSummary" class="pills"></div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal"><div id="modalContent" class="modalContent"></div></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

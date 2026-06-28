@@ -1,0 +1,22 @@
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f4f6fb;color:#111827;padding-bottom:80px}
+header{background:#111827;color:white;padding:14px;padding-top:calc(14px + env(safe-area-inset-top));position:sticky;top:0;z-index:20}
+.brand{display:flex;gap:10px;align-items:center}.brand img{width:52px;height:52px;border-radius:50%;background:white;object-fit:contain}
+h1{margin:0;font-size:18px}h2{margin:4px 0 10px}.sub{font-size:12px;color:#d1d5db}
+main{padding:10px;max-width:1180px;margin:auto}.card,.bar{background:white;border:1px solid #d1d5db;border-radius:14px;padding:10px;margin-bottom:10px}
+.bar,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.grow{flex:1;min-width:180px}.full{grid-column:1/-1}
+button{background:#111827;color:white;border:1px solid #d1d5db;border-radius:9px;padding:9px;cursor:pointer;font-size:14px}
+button.secondary,.uploadBtn{background:white;color:#111827;border:1px solid #d1d5db;border-radius:9px;padding:9px;cursor:pointer;font-size:14px}
+button.ok{background:#047857}button.danger{background:#b91c1c}button.copy{background:#2563eb}
+input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:9px;font-size:16px;background:white}textarea{min-height:80px}
+input[type=checkbox]{width:22px;height:22px}.uploadBtn input{display:none}label{display:block;font-size:12px;color:#6b7280;margin-bottom:4px}
+.hidden{display:none!important}.small{font-size:12px;color:#6b7280}.saved{color:#047857;font-weight:bold}.unsaved{color:#b45309;font-weight:bold}
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.familyCard{background:white;border:1px solid #d1d5db;border-radius:14px;padding:14px;box-shadow:0 1px 3px #0001;cursor:pointer}
+.familyCard b{font-size:17px}.familyCard span{display:block;color:#6b7280;margin-top:6px}
+.recipeCard{background:white;border:1px solid #d1d5db;border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px #0001}
+.topLine{display:flex;gap:10px;align-items:center;margin-bottom:8px}.title{font-weight:bold;font-size:16px;flex:1}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+.readonly{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:9px;font-weight:bold;min-height:38px}
+.badge{font-weight:bold;border-radius:8px;padding:8px;display:inline-block;min-width:80px;text-align:center}.green{background:#dcfce7;color:#166534;border:1px solid #86efac}.orange{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}.red{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pill{background:#f3f4f6;border:1px solid #d1d5db;border-radius:999px;padding:7px 10px;font-size:13px}
+.actions{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:10px}.modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}.modalContent{background:white;border-radius:14px;padding:14px;max-width:680px;width:100%;max-height:90vh;overflow:auto}.box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:10px;margin:10px 0}.qr{max-width:220px;width:100%;border:1px solid #d1d5db;border-radius:12px;padding:8px;background:white}
