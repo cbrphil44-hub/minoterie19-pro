@@ -1,5 +1,5 @@
-# Application Recette 19 V4
+# Application Recette 19 V5
 
 Lien officiel : https://application-recette-19.netlify.app
 
-Corrections : coût pièce/poids, interface cartes, suppression fiche client.
+Ajouts : menu familles visible, installation client, export/import des recettes.
