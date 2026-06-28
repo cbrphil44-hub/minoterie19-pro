@@ -11,19 +11,25 @@
 </head>
 <body>
 <header>
-  <div class="brand"><img src="icon-192.png" alt="Recette 19"><div><h1>Application Recette 19</h1><div class="sub">V10 Propre — Firebase + données protégées</div></div></div>
+  <div class="brand">
+    <img src="icon-192.png" alt="Recette 19">
+    <div>
+      <h1>Application Recette 19</h1>
+      <div class="sub">V11 Clean — accès Firebase stable</div>
+    </div>
+  </div>
 </header>
 
-<section id="accessGate" class="accessGate" style="display:none">
+<section id="accessGate" class="accessGate">
   <div class="accessCard">
     <img src="icon-192.png" alt="Application Recette 19">
     <h2>Accès réservé</h2>
-    <p>Pour utiliser l'application, demandez l'autorisation avec le nom de votre boulangerie.</p>
+    <p>Renseignez le nom de votre boulangerie pour demander l'autorisation.</p>
     <label>Nom de la boulangerie</label>
     <input id="bakeryNameInput" placeholder="Ex : Boulangerie Dupont">
-    <button onclick="window.App.requestAccess()">Demander l'accès</button>
-    <button class="secondary" onclick="window.App.checkAccess()">Vérifier l'autorisation</button>
-    <p id="accessStatus" class="small"></p>
+    <button id="btnRequestAccess" type="button">Demander l'accès</button>
+    <button id="btnCheckAccess" type="button" class="secondary">Vérifier l'autorisation</button>
+    <p id="accessStatus" class="small">Chargement...</p>
   </div>
 </section>
 
@@ -31,31 +37,45 @@
   <section id="installBox" class="installBox">
     <b>📱 Installez l'application</b>
     <p>Ajoutez cette application à l'écran d'accueil pour l'utiliser comme une vraie application.</p>
-    <button onclick="App.installHelp()">Comment installer ?</button>
-    <button class="secondary" onclick="App.hideInstall()">Plus tard</button>
+    <button id="btnInstallHelp" type="button">Comment installer ?</button>
+    <button id="btnHideInstall" class="secondary" type="button">Plus tard</button>
   </section>
 
   <div class="toolbar">
-    <button onclick="App.newFamily()">Nouvelle famille</button>
-    <button onclick="App.newRecipe()">Nouvelle recette</button>
-    <button class="copy" onclick="App.openPublish()">Créer mise à jour</button>
-    <button class="secondary" onclick="App.openClientSend()">Envoyer recette client</button>
-    <button class="secondary" onclick="App.openAdmin()">Admin accès</button>
-    <button class="secondary" onclick="App.settings()">Paramètres</button>
-    <button class="ok" onclick="App.save()">Sauvegarder</button>
+    <button id="btnNewFamily" type="button">Nouvelle famille</button>
+    <button id="btnNewRecipe" type="button">Nouvelle recette</button>
+    <button id="btnPublish" class="copy" type="button">Créer mise à jour</button>
+    <button id="btnClientSend" class="secondary" type="button">Envoyer recette client</button>
+    <button id="btnAdmin" class="secondary" type="button">Admin accès</button>
+    <button id="btnSettings" class="secondary" type="button">Paramètres</button>
+    <button id="btnSave" class="ok" type="button">Sauvegarder</button>
     <span id="status" class="saved">Sauvegarde automatique active</span>
   </div>
 
   <div class="layout">
-    <aside class="familiesPanel"><div class="panelTitle">📂 Familles</div><div id="familiesList"></div><button class="secondary fullBtn" onclick="App.newFamily()">+ Nouvelle famille</button></aside>
+    <aside class="familiesPanel">
+      <div class="panelTitle">📂 Familles</div>
+      <div id="familiesList"></div>
+      <button id="btnNewFamily2" class="secondary fullBtn" type="button">+ Nouvelle famille</button>
+    </aside>
     <section class="content">
-      <div class="card"><div class="row"><div class="grow"><label>Recherche</label><input id="search" placeholder="Rechercher une recette..." oninput="App.render()"></div></div><div id="summary" class="pills"></div></div>
+      <div class="card">
+        <div class="row">
+          <div class="grow">
+            <label>Recherche</label>
+            <input id="search" placeholder="Rechercher une recette...">
+          </div>
+        </div>
+        <div id="summary" class="pills"></div>
+      </div>
       <section id="list"></section>
     </section>
   </div>
 </main>
 
-<div id="modal" class="modal"><div id="modalContent" class="modalContent"></div></div>
+<div id="modal" class="modal">
+  <div id="modalContent" class="modalContent"></div>
+</div>
 
 <form name="recette-client" method="POST" data-netlify="true" netlify hidden>
   <input type="hidden" name="form-name" value="recette-client">
@@ -68,6 +88,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="data.js"></script>
+<script src="firebase.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

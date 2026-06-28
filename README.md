@@ -1,3 +1,9 @@
-# Application Recette 19 V10 Propre
+# Application Recette 19 V11 Clean
 
-Version reconstruite complète : Firebase, accès contrôlé, recettes, familles, sauvegarde automatique et données protégées.
+Version reconstruite proprement :
+- index.html cohérent V11 ;
+- Firebase séparé dans firebase.js ;
+- app.js stable ;
+- demande d'accès Firestore dans demandes_acces ;
+- admin accès avec code 1919 ;
+- données recettes protégées et sauvegarde automatique.
