@@ -1,14 +1,5 @@
-# Minoterie 19 Pro
+# Application Recette 19 V4
 
-Application web PWA pour le calcul de prix de revient et de marge en boulangerie artisanale.
+Lien officiel : https://application-recette-19.netlify.app
 
-## Fichiers
-- `index.html` : interface principale
-- `style.css` : mise en forme
-- `app.js` : logique de l'application
-- `data.js` : recettes de départ
-- `manifest.webmanifest` : installation PWA
-- `service-worker.js` : cache hors ligne
-
-## Lien officiel
-https://minoterie19.netlify.app
+Corrections : coût pièce/poids, interface cartes, suppression fiche client.

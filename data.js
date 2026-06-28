@@ -1,6 +1,6 @@
-window.M19_INITIAL_DATA = {
-  "version": "2.0.0",
-  "officialUrl": "https://minoterie19.netlify.app",
+window.RECETTE19_INITIAL = {
+  "version": "4.0.0",
+  "officialUrl": "https://application-recette-19.netlify.app",
   "families": [
     "Pain",
     "Pain spécial",
@@ -611,12 +611,5 @@ window.M19_INITIAL_DATA = {
       "coef": 4.9,
       "priceMode": "piece"
     }
-  ],
-  "client": {
-    "bakery": "",
-    "manager": "",
-    "phone": "",
-    "date": "",
-    "notes": ""
-  }
+  ]
 };

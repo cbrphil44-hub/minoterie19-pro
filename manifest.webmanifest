@@ -1,6 +1,6 @@
 {
-  "name": "Minoterie 19 Pro",
-  "short_name": "Minoterie19",
+  "name": "Application Recette 19",
+  "short_name": "Recette 19",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6fb",
