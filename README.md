@@ -1,5 +1,3 @@
-# Application Recette 19 V9.1
+# Application Recette 19 V10 Propre
 
-- Correctif boutons Demander l'accès / Vérifier l'autorisation.
-- Messages d'erreur visibles sous les boutons.
-- Écriture Firestore dans la collection demandes_acces.
+Version reconstruite complète : Firebase, accès contrôlé, recettes, familles, sauvegarde automatique et données protégées.
