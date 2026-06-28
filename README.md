@@ -1,5 +1,5 @@
-# Application Recette 19 V5.2
+# Application Recette 19 V6
 
 Lien officiel : https://application-recette-19.netlify.app
 
-Corrections : sauvegarde automatique, données conservées entre mises à jour, confirmations avant suppression.
+V6 : partage sélectif gratuit par fichier JSON, sauvegarde automatique, données conservées, confirmations avant suppression.
