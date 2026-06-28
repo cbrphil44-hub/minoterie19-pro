@@ -1,8 +1,5 @@
-# Application Recette 19 V9 Cloud Firebase
+# Application Recette 19 V9.1
 
-- Demande d’accès par nom de boulangerie.
-- Application bloquée tant que non autorisée.
-- Admin accès avec code 1919.
-- Firestore : collection demandes_acces.
-
-Important : règles Firestore à configurer après publication.
+- Correctif boutons Demander l'accès / Vérifier l'autorisation.
+- Messages d'erreur visibles sous les boutons.
+- Écriture Firestore dans la collection demandes_acces.
