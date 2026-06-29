@@ -3,6 +3,31 @@ const App = (() => {
   const STORE = "recette19_v11_donnees_protegees";
   const ACCESS_STORE = "recette19_v11_access";
   const ADMIN_PIN = "1702";
+  const ADMIN_ERROR_KEY = "recette19_admin_errors_v12_3";
+
+  function logAdminError(source, error) {
+    try {
+      const list = JSON.parse(localStorage.getItem(ADMIN_ERROR_KEY) || "[]");
+      list.unshift({
+        date: new Date().toLocaleString("fr-FR"),
+        source,
+        message: error && error.message ? error.message : String(error || "Erreur inconnue")
+      });
+      localStorage.setItem(ADMIN_ERROR_KEY, JSON.stringify(list.slice(0, 80)));
+    } catch {}
+  }
+
+  function getAdminErrors() {
+    try { return JSON.parse(localStorage.getItem(ADMIN_ERROR_KEY) || "[]"); }
+    catch { return []; }
+  }
+
+  function clearAdminErrors() {
+    localStorage.removeItem(ADMIN_ERROR_KEY);
+    alert("Rapport d'erreur vidé.");
+    openAdmin();
+  }
+
   let isAdmin = false;
   let logoPressTimer = null;
   const URL = INIT.officialUrl || "https://application-recette-19.netlify.app";
@@ -549,81 +574,254 @@ const App = (() => {
   }
 
   async function openAdmin() {
-    if (!isAdmin) return;
-    const pin = ADMIN_PIN;
+    const pin = prompt("Code administrateur");
+    if (pin !== ADMIN_PIN) return alert("Code incorrect.");
     if (!initFirebase()) return alert("Firebase non disponible.");
 
-    modal(`<h2>Administration des accès</h2><div class="box"><b>Demandes d’accès</b></div><div id="adminList">Chargement...</div><button class="secondary" data-action="closeModal">Fermer</button>`);
+    modal(`
+      <h2>Gestion des accès</h2>
+      <div class="box">
+        <b>Demandes d'accès au logiciel</b>
+        <p>Gère les demandes sans ouvrir Firebase.</p>
 
-    const list = $("adminList");
+        <div class="row">
+          <div class="grow">
+            <label>Recherche</label>
+            <input id="adminAccessSearch" placeholder="Nom de la boulangerie...">
+          </div>
+          <div>
+            <label>Tri</label>
+            <select id="adminAccessSort">
+              <option value="date_desc">Plus récent</option>
+              <option value="date_asc">Plus ancien</option>
+              <option value="name_asc">Nom A → Z</option>
+              <option value="status_asc">Statut</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <button class="secondary" data-action="refreshAccessList">Actualiser</button>
+          <button class="secondary" data-action="toggleErrorReport">Rapport d'erreur</button>
+          <button class="secondary" data-action="closeModal">Fermer</button>
+        </div>
+      </div>
+
+      <div id="adminAccessSummary" class="pills"></div>
+      <div id="adminErrorReport" class="box" style="display:none"></div>
+      <div id="adminList">Chargement...</div>
+    `);
+
+    await loadAccessList();
+
+    const search = document.getElementById("adminAccessSearch");
+    const sort = document.getElementById("adminAccessSort");
+    if (search) search.addEventListener("input", () => loadAccessList());
+    if (sort) sort.addEventListener("change", () => loadAccessList());
+  }
+
+  function accessBadge(status) {
+    const s = status || "en_attente";
+    if (s === "autorise") return '<span class="accessBadge okBadge">Autorisée</span>';
+    if (s === "refuse") return '<span class="accessBadge refuseBadge">Refusée</span>';
+    if (s === "suspendu") return '<span class="accessBadge suspendBadge">Suspendue</span>';
+    return '<span class="accessBadge waitBadge">En attente</span>';
+  }
+
+  function createdAtMs(d) {
     try {
-      const snap = await firestore.collection("demandes_acces").orderBy("createdAt", "desc").limit(50).get();
-      if (snap.empty) {
-        list.innerHTML = "<p>Aucune demande.</p>";
+      if (d.createdAt && d.createdAt.toDate) return d.createdAt.toDate().getTime();
+      if (d.createdAt) return new Date(d.createdAt).getTime() || 0;
+    } catch {}
+    return 0;
+  }
+
+  async function loadAccessList() {
+    if (!initFirebase()) return;
+
+    const list = document.getElementById("adminList");
+    const summary = document.getElementById("adminAccessSummary");
+    const searchEl = document.getElementById("adminAccessSearch");
+    const sortEl = document.getElementById("adminAccessSort");
+
+    if (!list) return;
+    list.innerHTML = "Chargement...";
+
+    try {
+      const snap = await firestore.collection("demandes_acces").limit(200).get();
+      let docs = [];
+      snap.forEach(doc => docs.push({ id: doc.id, data: doc.data() || {} }));
+
+      const q = String(searchEl?.value || "").trim().toLowerCase();
+      if (q) docs = docs.filter(item => String(item.data.bakeryName || item.id).toLowerCase().includes(q));
+
+      const sort = sortEl?.value || "date_desc";
+      docs.sort((a, b) => {
+        const da = a.data || {};
+        const db = b.data || {};
+        if (sort === "date_asc") return createdAtMs(da) - createdAtMs(db);
+        if (sort === "name_asc") return String(da.bakeryName || a.id).localeCompare(String(db.bakeryName || b.id), "fr");
+        if (sort === "status_asc") return String(da.status || "en_attente").localeCompare(String(db.status || "en_attente"), "fr");
+        return createdAtMs(db) - createdAtMs(da);
+      });
+
+      const counts = { en_attente: 0, autorise: 0, refuse: 0, suspendu: 0 };
+      docs.forEach(item => {
+        const s = item.data.status || "en_attente";
+        counts[s] = (counts[s] || 0) + 1;
+      });
+
+      if (summary) {
+        summary.innerHTML = `
+          <div class="pill">Total : <b>${docs.length}</b></div>
+          <div class="pill">En attente : <b>${counts.en_attente || 0}</b></div>
+          <div class="pill">Autorisées : <b>${counts.autorise || 0}</b></div>
+          <div class="pill">Refusées : <b>${counts.refuse || 0}</b></div>
+          <div class="pill">Suspendues : <b>${counts.suspendu || 0}</b></div>
+        `;
+      }
+
+      if (!docs.length) {
+        list.innerHTML = "<p>Aucune demande trouvée.</p>";
+        renderErrorReport(false);
         return;
       }
 
       list.innerHTML = "";
-      snap.forEach((doc) => {
-        const d = doc.data();
+      docs.forEach(item => {
+        const d = item.data;
         const row = document.createElement("div");
-        row.className = "adminLine";
-        row.innerHTML = `<div><b>${esc(d.bakeryName || doc.id)}</b><div class="adminStatus">Statut : ${esc(d.status || "en_attente")}<br>${esc(doc.id)}</div></div><button class="ok" data-action="authorize" data-id="${esc(doc.id)}">Accepter</button><button class="secondary" data-action="pending" data-id="${esc(doc.id)}">En attente</button><button class="danger" data-action="refuse" data-id="${esc(doc.id)}">Refuser</button><button class="secondary" data-action="suspend" data-id="${esc(doc.id)}">Suspendre</button><button class="danger" data-action="deleteAccess" data-id="${esc(doc.id)}">Supprimer</button>`;
+        row.className = "adminAccessCard";
+        const dateTxt = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toLocaleString("fr-FR") : "Date inconnue";
+        row.innerHTML = `
+          <div class="adminAccessHeader">
+            <div>
+              <b>${esc(d.bakeryName || item.id)}</b>
+              <div class="adminStatus">${esc(item.id)}<br>${esc(dateTxt)}</div>
+            </div>
+            ${accessBadge(d.status)}
+          </div>
+          <div class="adminAccessActions">
+            <button class="ok" data-action="authorize" data-id="${esc(item.id)}">Accepter</button>
+            <button class="danger" data-action="refuse" data-id="${esc(item.id)}">Refuser</button>
+            <button class="secondary" data-action="pending" data-id="${esc(item.id)}">En attente</button>
+            <button class="secondary" data-action="suspend" data-id="${esc(item.id)}">Suspendre</button>
+            <button class="danger" data-action="deleteAccess" data-id="${esc(item.id)}">Supprimer</button>
+          </div>
+        `;
         list.appendChild(row);
       });
+
+      renderErrorReport(false);
     } catch (e) {
-      list.innerHTML = "<p>Erreur : " + esc(e.message || e) + "</p>";
+      logAdminError("Chargement demandes accès", e);
+      list.innerHTML = "<p>Erreur de chargement : " + esc(e.message || e) + "</p>";
+      renderErrorReport(true);
     }
+  }
+
+  function renderErrorReport(forceOpen = false) {
+    const box = document.getElementById("adminErrorReport");
+    if (!box) return;
+
+    const errors = getAdminErrors();
+    if (forceOpen) box.style.display = "block";
+
+    if (!errors.length) {
+      box.innerHTML = "<b>Rapport d'erreur</b><p>Aucune erreur enregistrée.</p>";
+      return;
+    }
+
+    box.innerHTML = `
+      <b>Rapport d'erreur</b>
+      <p>${errors.length} erreur(s) enregistrée(s).</p>
+      <button class="danger" data-action="clearErrorReport">Vider le rapport</button>
+      <div class="errorList">
+        ${errors.map(e => `<div class="errorItem"><b>${esc(e.date)}</b><br>${esc(e.source)}<br><span>${esc(e.message)}</span></div>`).join("")}
+      </div>
+    `;
+  }
+
+  function toggleErrorReport() {
+    const box = document.getElementById("adminErrorReport");
+    if (!box) return;
+    box.style.display = box.style.display === "none" ? "block" : "none";
+    renderErrorReport(false);
   }
 
   async function authorizeAccess(id) {
     if (!initFirebase()) return;
-    await firestore.collection("demandes_acces").doc(id).set({
-      status: "autorise",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    alert("Accès autorisé.");
-    openAdmin();
+    try {
+      await firestore.collection("demandes_acces").doc(id).set({
+        status: "autorise",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await loadAccessList();
+    } catch (e) {
+      logAdminError("Accepter demande", e);
+      alert("Erreur : " + (e.message || e));
+      renderErrorReport(true);
+    }
   }
 
   async function refuseAccess(id) {
     if (!initFirebase()) return;
     if (!confirm("Refuser cet accès ?")) return;
-    await firestore.collection("demandes_acces").doc(id).set({
-      status: "refuse",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    alert("Accès refusé.");
-    openAdmin();
+    try {
+      await firestore.collection("demandes_acces").doc(id).set({
+        status: "refuse",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await loadAccessList();
+    } catch (e) {
+      logAdminError("Refuser demande", e);
+      alert("Erreur : " + (e.message || e));
+      renderErrorReport(true);
+    }
   }
 
   async function pendingAccess(id) {
     if (!initFirebase()) return;
-    await firestore.collection("demandes_acces").doc(id).set({
-      status: "en_attente",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    alert("Demande remise en attente.");
-    openAdmin();
+    try {
+      await firestore.collection("demandes_acces").doc(id).set({
+        status: "en_attente",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await loadAccessList();
+    } catch (e) {
+      logAdminError("Remettre en attente", e);
+      alert("Erreur : " + (e.message || e));
+      renderErrorReport(true);
+    }
   }
 
   async function suspendAccess(id) {
     if (!initFirebase()) return;
     if (!confirm("Suspendre cet accès ?")) return;
-    await firestore.collection("demandes_acces").doc(id).set({
-      status: "suspendu",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    alert("Accès suspendu.");
-    openAdmin();
+    try {
+      await firestore.collection("demandes_acces").doc(id).set({
+        status: "suspendu",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await loadAccessList();
+    } catch (e) {
+      logAdminError("Suspendre accès", e);
+      alert("Erreur : " + (e.message || e));
+      renderErrorReport(true);
+    }
   }
 
   async function deleteAccess(id) {
     if (!initFirebase()) return;
     if (!confirm("Supprimer définitivement cette demande ?")) return;
-    await firestore.collection("demandes_acces").doc(id).delete();
-    alert("Demande supprimée.");
-    openAdmin();
+    try {
+      await firestore.collection("demandes_acces").doc(id).delete();
+      await loadAccessList();
+    } catch (e) {
+      logAdminError("Supprimer demande", e);
+      alert("Erreur : " + (e.message || e));
+      renderErrorReport(true);
+    }
   }
 
   function openPublish() {
@@ -814,6 +1012,12 @@ const App = (() => {
       if (action === "pending") pendingAccess(id);
       if (action === "suspend") suspendAccess(id);
       if (action === "deleteAccess") deleteAccess(id);
+      if (action === "refreshAccessList") loadAccessList();
+      if (action === "toggleErrorReport") toggleErrorReport();
+      if (action === "clearErrorReport") clearAdminErrors();
+      if (action === "pending") pendingAccess(id);
+      if (action === "suspend") suspendAccess(id);
+      if (action === "deleteAccess") deleteAccess(id);
       if (action === "exportUpdate") exportUpdate();
       if (action === "exportClientRecipe") exportClientRecipe();
       if (action === "shareClientRecipeText") shareClientRecipeText();
@@ -844,6 +1048,9 @@ const App = (() => {
     openAdmin,
     authorizeAccess,
     refuseAccess,
+    clearAdminErrors,
+    toggleErrorReport,
+    loadAccessList,
     pendingAccess,
     suspendAccess,
     deleteAccess,
