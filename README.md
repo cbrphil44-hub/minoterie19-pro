@@ -1,9 +1,8 @@
-# Application Recette 19 V12.3 - Admin rond appui long
+# Application Recette 19 V12.3 - admin accès fiable
 
 Correctif isolé sans modification des recettes, calculs, familles ou sauvegardes.
 
-- Petit bouton rond en haut à droite de V12.
-- Appui long 5 secondes.
-- Code administrateur 1702.
-- Ouverture du tableau administrateur complet.
-- Appui long sur le logo 19 conservé en secours.
+- Bouton rond 🔒 près de V12.
+- Un clic demande le code 1702 pour éviter les problèmes d'appui long sur mobile.
+- Appui long 5 secondes sur le bouton ou le logo conservé.
+- Tableau administrateur complet : accès, erreurs, application, sauvegardes, informations.
