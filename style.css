@@ -98,3 +98,42 @@ button.copy{background:linear-gradient(135deg,#2563eb,#1d4ed8)}button.ok{backgro
 .client-mode #btnNewFamily,.client-mode #btnNewFamily2,.client-mode #btnNewRecipe,.client-mode #btnClientSend,.client-mode #btnSave{display:inline-block!important}
 .admin-mode #btnPublish,.admin-mode #btnAdmin,.admin-mode #btnSettings{display:inline-block!important}
 @media(max-width:760px){.adminTabs{display:grid;grid-template-columns:1fr 1fr}.adminAccessHeader{display:block}.adminAccessActions{display:grid;grid-template-columns:1fr 1fr}.adminAccessActions button{width:100%;min-width:0}}
+
+/* ===== V12.3 bouton admin rond long press ===== */
+.adminRoundTrigger{
+  margin-left:8px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  min-height:34px;
+  background:rgba(255,255,255,.12);
+  color:#fed7aa;
+  border:1px solid rgba(251,146,60,.55);
+  font-size:15px;
+  vertical-align:middle;
+}
+.adminRoundTrigger:active{transform:scale(.96)}
+.admin-mode .adminRoundTrigger{
+  background:#f97316;
+  color:white;
+  border-color:#fdba74;
+}
+.client-mode #btnPublish,
+.client-mode #btnAdmin,
+.client-mode #btnSettings{display:none!important}
+.admin-mode #btnPublish,
+.admin-mode #btnAdmin,
+.admin-mode #btnSettings{display:inline-block!important}
+@media(max-width:760px){
+  .adminRoundTrigger{
+    width:31px;
+    height:31px;
+    min-height:31px;
+    font-size:14px;
+    margin-left:6px;
+  }
+}
