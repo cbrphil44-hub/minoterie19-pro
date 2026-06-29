@@ -1,11 +1,19 @@
-# Application Recette 19 V12.2
+# Application Recette 19 V12.2 corrigée
 
-Module sécurité.
+Correction du mode client.
 
-- Version affichée : V12
-- Code administrateur : 1702
-- Appui long sur le logo pour activer le mode admin
-- Boutons admin masqués en mode client
-- Paramètres client simplifiés
-- Gestion des accès améliorée : Accepter, Refuser, En attente, Suspendre, Supprimer
-- Firebase et calculs conservés
+En mode client, les fonctions normales restent visibles :
+- Nouvelle famille
+- Nouvelle recette
+- Envoyer ma recette
+- Sauvegarde automatique
+- Modifier / supprimer recettes
+- Modifier / supprimer familles
+- Consulter / rechercher / calculer les coûts
+
+Fonctions réservées au mode administrateur :
+- Admin accès
+- Créer mise à jour
+- Paramètres avancés
+
+Mode administrateur : appui long 5 secondes sur le logo 19 + code 1702.

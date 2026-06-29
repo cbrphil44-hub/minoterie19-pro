@@ -29,3 +29,19 @@ button.copy{background:linear-gradient(135deg,#2563eb,#1d4ed8)}button.ok{backgro
 .adminLine{grid-template-columns:1fr repeat(5,auto);overflow:auto}
 .adminLine button{white-space:nowrap}
 @media(max-width:760px){.adminLine{grid-template-columns:1fr 1fr;gap:7px}.adminLine>div{grid-column:1/-1}.adminLine button{width:100%}}
+
+/* ===== V12.2 corrigée : le mode client garde les fonctions normales ===== */
+.client-mode .recipe .checks{display:flex!important}
+.client-mode .recipe .actions button{display:inline-block!important}
+.client-mode .familyLine button.smallBtn{display:inline-block!important}
+.client-mode #btnNewFamily,
+.client-mode #btnNewFamily2,
+.client-mode #btnNewRecipe,
+.client-mode #btnClientSend,
+.client-mode #btnSave{display:inline-block!important}
+.client-mode #btnPublish,
+.client-mode #btnAdmin,
+.client-mode #btnSettings{display:none!important}
+.admin-mode #btnPublish,
+.admin-mode #btnAdmin,
+.admin-mode #btnSettings{display:inline-block!important}

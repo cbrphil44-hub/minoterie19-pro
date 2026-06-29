@@ -40,14 +40,9 @@ const App = (() => {
     document.body.classList.toggle("client-mode", !isAdmin);
 
     const adminOnlyIds = [
-      "btnNewFamily",
-      "btnNewFamily2",
-      "btnNewRecipe",
       "btnPublish",
-      "btnClientSend",
       "btnAdmin",
-      "btnSettings",
-      "btnSave"
+      "btnSettings"
     ];
 
     adminOnlyIds.forEach((id) => {
@@ -56,7 +51,7 @@ const App = (() => {
     });
 
     const st = $("status");
-    if (st) st.textContent = isAdmin ? "Mode administrateur actif ✓" : "Mode client";
+    if (st) st.textContent = isAdmin ? "Mode administrateur actif ✓" : "Sauvegarde automatique active ✓";
   }
 
   function unlockAdmin() {
@@ -76,7 +71,7 @@ const App = (() => {
     const start = (e) => {
       e.preventDefault();
       clearTimeout(logoPressTimer);
-      logoPressTimer = setTimeout(unlockAdmin, 2500);
+      logoPressTimer = setTimeout(unlockAdmin, 5000);
     };
 
     const stop = () => {
@@ -351,7 +346,7 @@ const App = (() => {
       main.onclick = () => { current = f; render(); };
       line.appendChild(main);
 
-      if (f !== "Toutes" && mode === "admin") {
+      if (f !== "Toutes") {
         const edit = document.createElement("button");
         edit.className = "secondary smallBtn";
         edit.textContent = "✏️";
