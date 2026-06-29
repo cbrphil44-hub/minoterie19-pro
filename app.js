@@ -2,7 +2,9 @@ const App = (() => {
   const INIT = window.RECETTE19_INITIAL || {};
   const STORE = "recette19_v11_donnees_protegees";
   const ACCESS_STORE = "recette19_v11_access";
-  const ADMIN_PIN = "1919";
+  const ADMIN_PIN = "1702";
+  let isAdmin = false;
+  let logoPressTimer = null;
   const URL = INIT.officialUrl || "https://application-recette-19.netlify.app";
   const LEGACY = [
     "recette19_v10_donnees_protegees",
@@ -17,7 +19,7 @@ const App = (() => {
   ];
 
   let current = "Toutes";
-  let mode = "admin";
+  let mode = "user";
   let saveTimer = null;
   let firestore = null;
 
@@ -31,6 +33,64 @@ const App = (() => {
   const euro = (n) => (parse(n) || 0).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
   const num = (n, d = 2) => (parse(n) || 0).toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+
+
+  function applySecurityUI() {
+    document.body.classList.toggle("admin-mode", isAdmin);
+    document.body.classList.toggle("client-mode", !isAdmin);
+
+    const adminOnlyIds = [
+      "btnNewFamily",
+      "btnNewFamily2",
+      "btnNewRecipe",
+      "btnPublish",
+      "btnClientSend",
+      "btnAdmin",
+      "btnSettings",
+      "btnSave"
+    ];
+
+    adminOnlyIds.forEach((id) => {
+      const el = $(id);
+      if (el) el.style.display = isAdmin ? "" : "none";
+    });
+
+    const st = $("status");
+    if (st) st.textContent = isAdmin ? "Mode administrateur actif ✓" : "Mode client";
+  }
+
+  function unlockAdmin() {
+    const code = prompt("Code administrateur");
+    if (code !== ADMIN_PIN) return;
+    isAdmin = true;
+    mode = "admin";
+    applySecurityUI();
+    render();
+    alert("Mode administrateur activé.");
+  }
+
+  function bindLogoLongPress() {
+    const logo = $("mainLogo");
+    if (!logo) return;
+
+    const start = (e) => {
+      e.preventDefault();
+      clearTimeout(logoPressTimer);
+      logoPressTimer = setTimeout(unlockAdmin, 2500);
+    };
+
+    const stop = () => {
+      clearTimeout(logoPressTimer);
+      logoPressTimer = null;
+    };
+
+    logo.addEventListener("mousedown", start);
+    logo.addEventListener("touchstart", start, { passive: false });
+    logo.addEventListener("mouseup", stop);
+    logo.addEventListener("mouseleave", stop);
+    logo.addEventListener("touchend", stop);
+    logo.addEventListener("touchcancel", stop);
+  }
 
   function accessMsg(text) {
     const st = $("accessStatus");
@@ -76,6 +136,7 @@ const App = (() => {
     const main = $("mainApp");
     if (gate) gate.style.display = show ? "flex" : "none";
     if (main) main.style.display = show ? "none" : "block";
+    if (!show) applySecurityUI();
   }
 
   async function requestAccess() {
@@ -468,8 +529,8 @@ const App = (() => {
   }
 
   async function openAdmin() {
-    const pin = prompt("Code administrateur");
-    if (pin !== ADMIN_PIN) return alert("Code incorrect.");
+    if (!isAdmin) return;
+    const pin = ADMIN_PIN;
     if (!initFirebase()) return alert("Firebase non disponible.");
 
     modal(`<h2>Administration des accès</h2><div class="box"><b>Demandes d’accès</b></div><div id="adminList">Chargement...</div><button class="secondary" data-action="closeModal">Fermer</button>`);
@@ -487,7 +548,7 @@ const App = (() => {
         const d = doc.data();
         const row = document.createElement("div");
         row.className = "adminLine";
-        row.innerHTML = `<div><b>${esc(d.bakeryName || doc.id)}</b><div class="adminStatus">${esc(d.status || "en_attente")}<br>${esc(doc.id)}</div></div><button class="ok" data-action="authorize" data-id="${esc(doc.id)}">Autoriser</button><button class="danger" data-action="refuse" data-id="${esc(doc.id)}">Refuser</button>`;
+        row.innerHTML = `<div><b>${esc(d.bakeryName || doc.id)}</b><div class="adminStatus">Statut : ${esc(d.status || "en_attente")}<br>${esc(doc.id)}</div></div><button class="ok" data-action="authorize" data-id="${esc(doc.id)}">Accepter</button><button class="secondary" data-action="pending" data-id="${esc(doc.id)}">En attente</button><button class="danger" data-action="refuse" data-id="${esc(doc.id)}">Refuser</button><button class="secondary" data-action="suspend" data-id="${esc(doc.id)}">Suspendre</button><button class="danger" data-action="deleteAccess" data-id="${esc(doc.id)}">Supprimer</button>`;
         list.appendChild(row);
       });
     } catch (e) {
@@ -513,6 +574,35 @@ const App = (() => {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     alert("Accès refusé.");
+    openAdmin();
+  }
+
+  async function pendingAccess(id) {
+    if (!initFirebase()) return;
+    await firestore.collection("demandes_acces").doc(id).set({
+      status: "en_attente",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    alert("Demande remise en attente.");
+    openAdmin();
+  }
+
+  async function suspendAccess(id) {
+    if (!initFirebase()) return;
+    if (!confirm("Suspendre cet accès ?")) return;
+    await firestore.collection("demandes_acces").doc(id).set({
+      status: "suspendu",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    alert("Accès suspendu.");
+    openAdmin();
+  }
+
+  async function deleteAccess(id) {
+    if (!initFirebase()) return;
+    if (!confirm("Supprimer définitivement cette demande ?")) return;
+    await firestore.collection("demandes_acces").doc(id).delete();
+    alert("Demande supprimée.");
     openAdmin();
   }
 
@@ -577,6 +667,7 @@ const App = (() => {
   }
 
   function settings() {
+    if (!isAdmin) { modal(`<h2>Paramètres</h2><div class="box"><b>Version V12</b></div><div class="box">Application Recette 19</div><button class="secondary" data-action="closeModal">Fermer</button>`); return; }
     modal(`<h2>Paramètres</h2><div class="box"><b>Version ${INIT.version || "11.0.0"}</b><br>Données protégées V11.</div><div class="box"><b>Mode</b><div class="row"><button data-action="setModeAdmin">Mode Admin</button><button class="secondary" data-action="setModeUser">Mode Utilisateur</button></div></div><div class="box"><div class="row"><button data-action="exportJSON">Sauvegarde JSON</button><label class="uploadBtn">Restaurer JSON<input type="file" id="importJsonFile" accept=".json"></label><button data-action="exportCSV">Export CSV</button></div></div><button class="secondary" data-action="closeModal">Fermer</button>`);
   }
 
@@ -684,6 +775,9 @@ const App = (() => {
       if (action === "closeModal") closeModal();
       if (action === "authorize") authorizeAccess(id);
       if (action === "refuse") refuseAccess(id);
+      if (action === "pending") pendingAccess(id);
+      if (action === "suspend") suspendAccess(id);
+      if (action === "deleteAccess") deleteAccess(id);
       if (action === "exportUpdate") exportUpdate();
       if (action === "exportClientRecipe") exportClientRecipe();
       if (action === "shareClientRecipeText") shareClientRecipeText();
@@ -696,6 +790,8 @@ const App = (() => {
 
   function start() {
     bindEvents();
+    bindLogoLongPress();
+    applySecurityUI();
     if (localStorage.getItem("recette19_install_hidden") === "1" && $("installBox")) $("installBox").style.display = "none";
     save();
     initFirebase();
@@ -711,6 +807,9 @@ const App = (() => {
     openAdmin,
     authorizeAccess,
     refuseAccess,
+    pendingAccess,
+    suspendAccess,
+    deleteAccess,
     render,
     save,
     newFamily,

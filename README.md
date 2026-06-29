@@ -1,9 +1,11 @@
-# Application Recette 19 V12.1
+# Application Recette 19 V12.2
 
-Module interface uniquement.
+Module sécurité.
 
-- Affichage version : V12
-- Logo / icônes corrigés
-- Titres des recettes mis en valeur en orange
-- Interface plus moderne et lisible
-- Firebase et logique d'accès non modifiés
+- Version affichée : V12
+- Code administrateur : 1702
+- Appui long sur le logo pour activer le mode admin
+- Boutons admin masqués en mode client
+- Paramètres client simplifiés
+- Gestion des accès améliorée : Accepter, Refuser, En attente, Suspendre, Supprimer
+- Firebase et calculs conservés

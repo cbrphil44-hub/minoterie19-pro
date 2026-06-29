@@ -18,3 +18,14 @@ button.copy{background:linear-gradient(135deg,#2563eb,#1d4ed8)}button.ok{backgro
 .checkItem{background:#fff;border-color:#fed7aa;color:#7c2d12}
 .readonly{background:#fafafa}.accessCard{border-top:5px solid var(--r19-orange)}.accessCard h2{color:#7c2d12}.pill{background:#fff;border-color:#e5e7eb}.panelTitle{color:#7c2d12}
 @media(max-width:760px){header{padding:12px}.brand .appLogo{width:50px;height:50px}h1{font-size:17px}.sub{font-size:11px}.recipe{padding:10px;border-left-width:4px}.recipeTitleBox input{font-size:18px;padding:10px}button{min-height:42px}}
+
+/* ===== V12.2 Sécurité ===== */
+.client-mode .adminOnly{display:none!important}
+.admin-mode header{box-shadow:0 0 0 3px rgba(249,115,22,.25),0 2px 12px #0002}
+.admin-mode .sub::after{content:" · ADMIN";color:#fff;font-weight:900}
+.client-mode .recipe .checks{display:none}
+.client-mode .recipe .actions button{display:none}
+.client-mode .familyLine button.smallBtn{display:none}
+.adminLine{grid-template-columns:1fr repeat(5,auto);overflow:auto}
+.adminLine button{white-space:nowrap}
+@media(max-width:760px){.adminLine{grid-template-columns:1fr 1fr;gap:7px}.adminLine>div{grid-column:1/-1}.adminLine button{width:100%}}
