@@ -200,17 +200,42 @@ const App = (() => {
   }
 
   function loadDB() {
-    for (const k of LEGACY) {
+    const keys = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.includes("recette19") || LEGACY.includes(k))) keys.push(k);
+      }
+    } catch {}
+
+    const uniqueKeys = [...new Set([STORE, ...LEGACY, ...keys])];
+    const candidates = [];
+
+    for (const k of uniqueKeys) {
       const raw = localStorage.getItem(k);
       if (!raw) continue;
       try {
         const d = JSON.parse(raw);
-        if (Array.isArray(d.recipes) && Array.isArray(d.families)) {
-          localStorage.setItem(STORE, JSON.stringify(d));
-          return d;
+        if (d && Array.isArray(d.recipes) && Array.isArray(d.families)) {
+          candidates.push({
+            key: k,
+            data: d,
+            recipes: d.recipes.length,
+            families: d.families.length,
+            score: d.recipes.length * 10 + d.families.length
+          });
         }
       } catch {}
     }
+
+    if (candidates.length) {
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0].data;
+      localStorage.setItem(STORE + "_backup_before_v12_recovery", JSON.stringify(best));
+      localStorage.setItem(STORE, JSON.stringify(best));
+      return best;
+    }
+
     return structuredClone(INIT);
   }
 
@@ -663,7 +688,7 @@ const App = (() => {
 
   function settings() {
     if (!isAdmin) { modal(`<h2>Paramètres</h2><div class="box"><b>Version V12</b></div><div class="box">Application Recette 19</div><button class="secondary" data-action="closeModal">Fermer</button>`); return; }
-    modal(`<h2>Paramètres</h2><div class="box"><b>Version ${INIT.version || "11.0.0"}</b><br>Données protégées V11.</div><div class="box"><b>Mode</b><div class="row"><button data-action="setModeAdmin">Mode Admin</button><button class="secondary" data-action="setModeUser">Mode Utilisateur</button></div></div><div class="box"><div class="row"><button data-action="exportJSON">Sauvegarde JSON</button><label class="uploadBtn">Restaurer JSON<input type="file" id="importJsonFile" accept=".json"></label><button data-action="exportCSV">Export CSV</button></div></div><button class="secondary" data-action="closeModal">Fermer</button>`);
+    modal(`<h2>Paramètres</h2><div class="box"><b>Version ${INIT.version || "11.0.0"}</b><br>Données protégées V11.</div><div class="box"><b>Mode</b><div class="row"><button data-action="setModeAdmin">Mode Admin</button><button class="secondary" data-action="setModeUser">Mode Utilisateur</button></div></div><div class="box"><div class="row"><button data-action="exportJSON">Sauvegarde JSON</button><label class="uploadBtn">Restaurer JSON<input type="file" id="importJsonFile" accept=".json"></label><button data-action="exportCSV">Export CSV</button><button data-action="exportAllLocalData">Sauvegarde totale</button></div></div><button class="secondary" data-action="closeModal">Fermer</button>`);
   }
 
   function setMode(m) {
@@ -671,6 +696,22 @@ const App = (() => {
     closeModal();
     render();
     autoSave();
+  }
+
+
+  function exportAllLocalData() {
+    const data = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.includes("recette19")) data[k] = localStorage.getItem(k);
+      }
+    } catch {}
+    downloadJSON({
+      type: "recette19-localstorage-backup",
+      createdAt: new Date().toISOString(),
+      data
+    }, "sauvegarde_toutes_donnees_recette19.json");
   }
 
   function exportJSON() {
@@ -780,6 +821,7 @@ const App = (() => {
       if (action === "setModeUser") setMode("user");
       if (action === "exportJSON") exportJSON();
       if (action === "exportCSV") exportCSV();
+      if (action === "exportAllLocalData") exportAllLocalData();
     });
   }
 
@@ -825,6 +867,7 @@ const App = (() => {
     setMode,
     exportJSON,
     exportCSV,
+    exportAllLocalData,
     installHelp,
     hideInstall
   };

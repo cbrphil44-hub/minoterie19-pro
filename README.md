@@ -1,19 +1,6 @@
-# Application Recette 19 V12.2 corrigée
+# Application Recette 19 V12.2 - récupération données
 
-Correction du mode client.
+Cette version ne repart pas d'une base neuve.
+Elle recherche toutes les anciennes sauvegardes locales Recette 19 dans le navigateur et reprend automatiquement celle qui contient le plus de recettes/familles.
 
-En mode client, les fonctions normales restent visibles :
-- Nouvelle famille
-- Nouvelle recette
-- Envoyer ma recette
-- Sauvegarde automatique
-- Modifier / supprimer recettes
-- Modifier / supprimer familles
-- Consulter / rechercher / calculer les coûts
-
-Fonctions réservées au mode administrateur :
-- Admin accès
-- Créer mise à jour
-- Paramètres avancés
-
-Mode administrateur : appui long 5 secondes sur le logo 19 + code 1702.
+Important : ne pas vider le cache Chrome avant récupération.
