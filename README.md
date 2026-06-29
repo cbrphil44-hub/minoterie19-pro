@@ -1,8 +1,8 @@
-# Application Recette 19 V12.3 - admin accès fiable
+# Application Recette 19 V14
 
-Correctif isolé sans modification des recettes, calculs, familles ou sauvegardes.
+Version avec vrai encadré administrateur.
 
-- Bouton rond 🔒 près de V12.
-- Un clic demande le code 1702 pour éviter les problèmes d'appui long sur mobile.
-- Appui long 5 secondes sur le bouton ou le logo conservé.
-- Tableau administrateur complet : accès, erreurs, application, sauvegardes, informations.
+- Encadré Administrateur visible dans l'application.
+- Code administrateur : 1702.
+- Tableau administrateur : accès, erreurs, gestion application, sauvegardes, informations.
+- Aucune modification des recettes, calculs, familles ou sauvegardes.
